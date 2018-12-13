@@ -27,11 +27,16 @@ class Command:
 
         # Parse the message for tokens.
         tokens = message.content.split(' ')
+        
+        if tokens[0] not in responses:
+            raise InvalidCommandException(None, location)
 
         # Baseline acceptance criteria
-        if len(types) > len(tokens) - 1:
+        if len(types) > len(tokens)-1:
             # Command must have at least len(criteria) tokens.
-            raise InvalidCommandException(responses[tokens[0]]['usage'].format(self.sender.name), location)
+            raise InvalidCommandException(
+                responses[tokens[0]]['usage'].format(self.sender.name),
+                location)
         
         # Parse into arguments.
         self.args = []
@@ -39,7 +44,9 @@ class Command:
             try:
                 self.args.append(types[index](tokens[index+1]))
             except:
-                raise InvalidCommandException(responses[tokens[0]]['usage'].format(self.sender.name), location)
+                raise InvalidCommandException(
+                    responses[tokens[0]]['usage'].format(self.sender.name),
+                    location)
 
 async def send(location, message):
     global client
@@ -76,7 +83,7 @@ gambleChannel = None
 async def sendQuestion():
     global choices
     if choices == None:
-        question = json.loads(urllib.request.urlopen('https://opentdb.com/api.php?amount=1').read().decode('utf-8'))
+        question = json.loads(urllib.request.urlopen('https://opentdb.com/api.php?amount=1&category=18').read().decode('utf-8'))
         choices = [(choice, 0) for choice in question['results'][0]['incorrect_answers']]
         choices.append((question['results'][0]['correct_answer'], 1))
         random.shuffle(choices)
@@ -94,9 +101,6 @@ async def on_message(message):
     # Ignore messages sent by a bot.
     if message.author.bot:
         return
-    
-    # DEBUG
-    #print(str(message.content))
 
     if message.content.startswith('!answer'):
         try:
