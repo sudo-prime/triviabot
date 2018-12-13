@@ -122,7 +122,7 @@ async def on_message(message):
                         'Right! Well done, **{}**.',
                         'Ding! Good job, **{}**.'
                     ]]))
-                    await send(botsChannel, '!reward 200 {}'.format(message.author.mention))
+                    await send(botsChannel, '!reward 200 {}'.format(sender.id))
                     await send(gambleChannel, 'You\'ve been rewarded 200 beans.')
                     choices = None
                 else: # Incorrect!
@@ -134,7 +134,8 @@ async def on_message(message):
                         'Wrong!',
                         'Nope!',
                         'Try again!'
-                    ]))
+                    ]) + ' -100 beans!')
+                    await send(botsChannel, '!request 100 {}'.format(sender.id))
         except InvalidCommandException as e:
             await send(message.channel, e.value)
 
